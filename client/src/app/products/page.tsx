@@ -1,12 +1,21 @@
 "use client";
 
-import Header from "@/components/header";
-import Rating from "@/components/rating";
-import { useGetProductsQuery } from "@/state/api";
+import { useCreateProductMutation, useGetProductsQuery } from "@/state/api";
 import { PlusCircleIcon, SearchIcon } from "lucide-react";
 import { useState } from "react";
+import CreateProductModal from "./CreateProductModal";
+import Image from "next/image";
+import Header from "@/components/header";
+import Rating from "@/components/rating";
 
-export default function Product() {
+type ProductFormData = {
+  name: string;
+  price: number;
+  stockQuantity: number;
+  rating: number;
+};
+
+export default function Products() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -16,6 +25,11 @@ export default function Product() {
     isError,
   } = useGetProductsQuery(searchTerm);
 
+  const [createProduct] = useCreateProductMutation();
+  const handleCreateProduct = async (productData: ProductFormData) => {
+    await createProduct(productData);
+  };
+
   if (isLoading) {
     return <div className="py-4">Loading...</div>;
   }
@@ -23,14 +37,14 @@ export default function Product() {
   if (isError || !products) {
     return (
       <div className="text-center text-red-500 py-4">
-        Fail to fetch products
+        Failed to fetch products
       </div>
     );
   }
 
   return (
     <div className="mx-auto pb-5 w-full">
-      {/* SEARCH */}
+      {/* SEARCH BAR */}
       <div className="mb-6">
         <div className="flex items-center border-2 border-gray-200 rounded">
           <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
@@ -43,7 +57,7 @@ export default function Product() {
         </div>
       </div>
 
-      {/* HEADER */}
+      {/* HEADER BAR */}
       <div className="flex justify-between items-center mb-6">
         <Header name="Products" />
         <button
@@ -56,7 +70,7 @@ export default function Product() {
       </div>
 
       {/* BODY PRODUCTS LIST */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-between">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg-grid-cols-3 gap-10 justify-between">
         {isLoading ? (
           <div>Loading...</div>
         ) : (
@@ -66,11 +80,19 @@ export default function Product() {
               className="border shadow rounded-md p-4 max-w-full w-full mx-auto"
             >
               <div className="flex flex-col items-center">
-                img
+                {/* <Image
+                  src={`https://s3-inventorymanagement.s3.us-east-2.amazonaws.com/product${
+                    Math.floor(Math.random() * 3) + 1
+                  }.png`}
+                  alt={product.name}
+                  width={150}
+                  height={150}
+                  className="mb-3 rounded-2xl w-36 h-36"
+                /> */}
                 <h3 className="text-lg text-gray-900 font-semibold">
                   {product.name}
                 </h3>
-                <p className="text-gray-800">{product.price.toFixed(2)}</p>
+                <p className="text-gray-800">${product.price.toFixed(2)}</p>
                 <div className="text-sm text-gray-600 mt-1">
                   Stock: {product.stockQuantity}
                 </div>
@@ -86,6 +108,11 @@ export default function Product() {
       </div>
 
       {/* MODAL */}
+      <CreateProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCreate={handleCreateProduct}
+      />
     </div>
   );
 }
