@@ -52,7 +52,7 @@ export default function CreateProductModal({
     "block w-full mb-2 p-2 border-gray-500 border-2 rounded-md";
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-20">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-10 overflow-y-auto h-full w-full z-20">
       <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <Header name="Create New Product" />
         <form onSubmit={handleSubmit} className="mt-5">
